@@ -11,6 +11,11 @@ import io
 import av
 import threading
 import random
+from pathlib import Path
+from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
+
+# Resolve base directory relative to this script (works on Streamlit Cloud)
+BASE_DIR = Path(__file__).parent
 
 # Ensuring pyzbar works
 try:
@@ -205,9 +210,9 @@ with tab1:
     if st.button("Generate Stego Image & Key QR Code", type="primary"):
         if secret_text and decoy_url:
             try:
-                # Randomly select a cover image
+                # Randomly select a cover image (path resolved relative to script)
                 image_number = random.randint(0, 9)
-                cover_image_path = f"{image_number}.png"
+                cover_image_path = BASE_DIR / f"{image_number}.png"
                 try:
                     cover_image = Image.open(cover_image_path)
                     # Store the chosen image to display it later
@@ -283,7 +288,7 @@ with tab2:
             if qr_code_file:
                 st.image(qr_code_file, caption="Uploaded Key QR Code")
         else:
-            from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
+            # streamlit_webrtc already imported at top of file
             if st.session_state.get('scanned_qr_image'):
                 st.success("QR Code Captured!")
                 st.image(st.session_state.scanned_qr_image, caption="Captured QR Code")
